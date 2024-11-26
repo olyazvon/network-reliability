@@ -13,9 +13,9 @@ edges = (
 (19, 20))
 
 #Terminals:
-T1 = 1
-T2 = 2
-T3 = 3
+T1 = 4
+T2 = 10
+T3 = 17
 
 def generateStateVector(p):
     res = []
