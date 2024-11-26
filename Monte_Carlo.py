@@ -67,9 +67,11 @@ for p in p_range:
 #part e
 e=[]
 for i in range(1,6):
-    if (checkConnectivity(generateNetwork(generateStateVector(0.9)))):
-        e.append(1)
-    else:
-        e.append(0)
+    r=0
+    for j in range(M1):
+        if (checkConnectivity(generateNetwork(generateStateVector(0.9)))):
+            r=r+1
+    e.append(r/M1)
+
 print(e)
 print(statistics.stdev(e)/statistics.mean(e))
