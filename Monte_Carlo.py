@@ -19,7 +19,7 @@ T3 = 17
 
 def generateStateVector(p):
     res = []
-    for i in range(1, nodes_number+1):
+    for i in range(edges_number):
         res.append(random.random() < p)
 
     return res
@@ -27,8 +27,8 @@ def generateStateVector(p):
 def generateNetwork(stateVector):
     ds = DisjointSet.from_iterable(range(1, nodes_number+1))
 
-    for i in range(1, nodes_number+1):
-        if stateVector[i - 1]:
+    for i in range(0, edges_number):
+        if stateVector[i]:
             ds.union(edges[i][0], edges[i][1])
 
     return ds
@@ -36,20 +36,8 @@ def generateNetwork(stateVector):
 def checkConnectivity(ds):
     return ds.connected(T1, T2) and ds.connected(T2, T3)
 
-#
-# print(checkConnectivity(generateNetwork(generateStateVector(0.9))))
-def generate(p):
-    ds = DisjointSet.from_iterable(range(1, nodes_number+1))
-
-    for edge in edges:
-        if random.random() < p:
-            ds.union(edge[0], edge[1])
-
-        return ds
 
 
-def checkConnectivity(ds):
-    return ds.connected(T1, T2) and ds.connected(T2, T3)
 
 p_range=(0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,0.95,0.99)
 
@@ -61,7 +49,7 @@ for p in p_range:
             if checkConnectivity(generateNetwork(generateStateVector(p))):
                 r=r+1
         a.append(r/i)
-    print(p,a)
+    print(p,a[0],a[1])
 
 
 #part e
