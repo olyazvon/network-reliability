@@ -49,7 +49,7 @@ def checkConnectivity(ds):
 # Create table for different reliabilities
 p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
 
-print(f"{'p':>4} {'M=1000':>7} {'M=10000':>8}")
+print(f"{'p':>4} {f'M={M1}':>7} {f'M={M2}':>8}")
 for p in p_range:
     a = []
     for i in (M1, M2):
