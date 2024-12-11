@@ -17,6 +17,9 @@ T1 = 4
 T2 = 10
 T3 = 17
 
+# Repetitions
+M = [1000, 10000, 50000]
+
 def checkConnectivity(ds):
     return ds.connected(T1, T2) and ds.connected(T2, T3)
 
@@ -47,6 +50,27 @@ def calculateReliability(dSpectrum, p):
     return 1 - res
 
 
-print(generateDestructionSpectrum(10000))
-print(calculateReliability(generateDestructionSpectrum(10000), 0.5))
+#print(generateDestructionSpectrum(10000))
+#print(calculateReliability(generateDestructionSpectrum(10000), 0.5))
+
+
+# 1
+spectra = []
+
+for i, m in enumerate(M):
+    print(f"Distruction spectrum for M={m}:")
+    spectra.append(generateDestructionSpectrum(m))
+    print(spectra[i])
+print()
+
+# 2
+p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
+
+print(f"{'p':>4} {f'M={M[0]}':>8} {f'M={M[1]}':>8} {f'M={M[2]}':>8}")
+for p in p_range:
+    a = []
+    for s in spectra:
+        a.append(calculateReliability(s, p))
+    print(f"{p:>4} {a[0]:>.6f} {a[1]:>.6f} {a[2]:>.6f}")
+print()
 
