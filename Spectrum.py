@@ -74,3 +74,30 @@ for p in p_range:
     print(f"{p:>4} {a[0]:>.6f} {a[1]:>.6f} {a[2]:>.6f}")
 print()
 
+
+
+# Calculations according to our course:
+
+def F(n, k, p):
+    sumProb = 0
+    for j in range(k, n+1):
+        sumProb += binomialProbability(n, j, p)
+    return sumProb
+
+
+def altCalcRel(dSpectrum, p):
+    res = 0
+    for i in range(1, len(dSpectrum) + 1):
+        res += F(edges_number, i, 1 - p) * dSpectrum[i - 1]
+    return 1 - res
+
+# 2
+p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
+
+print(f"{'p':>4} {f'M={M[0]}':>8} {f'M={M[1]}':>8} {f'M={M[2]}':>8}")
+for p in p_range:
+    a = []
+    for s in spectra:
+        a.append(altCalcRel(s, p))
+    print(f"{p:>4} {a[0]:>.6f} {a[1]:>.6f} {a[2]:>.6f}")
+print()
