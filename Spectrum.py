@@ -20,6 +20,10 @@ T3 = 17
 # Repetitions
 M = [1000, 10000, 50000]
 
+# Edge reliability
+p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
+
+
 def checkConnectivity(ds):
     return ds.connected(T1, T2) and ds.connected(T2, T3)
 
@@ -42,16 +46,26 @@ def generateDestructionSpectrum(M):
 def binomialProbability(n, k, p):
     return comb(n, k) * (p ** k) * ((1 - p) ** (n - k))
 
-def calculateReliability(dSpectrum, p):
-    cumulativeSpectrum = [sum(dSpectrum[0:i + 1]) for i in range(len(dSpectrum))]
+# def calcReliabilityBySpectrum(dSpectrum, p):
+#     cumulativeSpectrum = [sum(dSpectrum[0:i + 1]) for i in range(len(dSpectrum))]
+#     res = 0
+#     for i in range(1, len(dSpectrum) + 1):
+#         res += binomialProbability(edges_number, i, 1 - p) * cumulativeSpectrum[i - 1]
+#     return 1 - res
+
+def F(n, k, p):
+    sumProb = 0
+    for j in range(k, n+1):
+        sumProb += binomialProbability(n, j, p)
+    return sumProb
+
+
+def calcReliabilityBySpectrum(dSpectrum, p):
     res = 0
     for i in range(1, len(dSpectrum) + 1):
-        res += binomialProbability(edges_number, i, 1 - p) * cumulativeSpectrum[i - 1]
+        res += F(edges_number, i, 1 - p) * dSpectrum[i - 1]
     return 1 - res
 
-
-#print(generateDestructionSpectrum(10000))
-#print(calculateReliability(generateDestructionSpectrum(10000), 0.5))
 
 
 # 1
@@ -63,41 +77,87 @@ for i, m in enumerate(M):
     print(spectra[i])
 print()
 
-# 2
-p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
+# # 2
+# p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
 
+# print(f"{'p':>4} {f'M={M[0]}':>8} {f'M={M[1]}':>8} {f'M={M[2]}':>8}")
+# for p in p_range:
+#     a = []
+#     for s in spectra:
+#         a.append(calcReliabilityBySpectrum(s, p))
+#     print(f"{p:>4} {a[0]:>.6f} {a[1]:>.6f} {a[2]:>.6f}")
+# print()
+
+
+# 2
+print("Spectrum-based reliability")
 print(f"{'p':>4} {f'M={M[0]}':>8} {f'M={M[1]}':>8} {f'M={M[2]}':>8}")
 for p in p_range:
     a = []
     for s in spectra:
-        a.append(calculateReliability(s, p))
+        a.append(calcReliabilityBySpectrum(s, p))
     print(f"{p:>4} {a[0]:>.6f} {a[1]:>.6f} {a[2]:>.6f}")
 print()
 
 
-
-# Calculations according to our course:
-
-def F(n, k, p):
-    sumProb = 0
-    for j in range(k, n+1):
-        sumProb += binomialProbability(n, j, p)
-    return sumProb
+#######
 
 
-def altCalcRel(dSpectrum, p):
-    res = 0
-    for i in range(1, len(dSpectrum) + 1):
-        res += F(edges_number, i, 1 - p) * dSpectrum[i - 1]
-    return 1 - res
+# Generate randomized state vector representing current state of network
+def generateStateVector(p):
+    res = []
+    for i in range(edges_number):
+        res.append(random.random() < p)
 
-# 2
-p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
+    return res
+
+# Make network model in terms of DSS
+def generateNetwork(stateVector):
+    ds = DisjointSet.from_iterable(range(1, nodes_number + 1))
+
+    for i in range(0, edges_number):
+        if stateVector[i]:
+            ds.union(edges[i][0], edges[i][1])
+
+    return ds
+
+def calcReliabilityMonteCarlo(p, repetitions):
+    r = 0
+    for j in range(repetitions):
+        if checkConnectivity(generateNetwork(generateStateVector(p))):
+            r += 1
+    return r/repetitions
+
+
+print("Monte Carlo-based reliability")
 
 print(f"{'p':>4} {f'M={M[0]}':>8} {f'M={M[1]}':>8} {f'M={M[2]}':>8}")
 for p in p_range:
     a = []
-    for s in spectra:
-        a.append(altCalcRel(s, p))
-    print(f"{p:>4} {a[0]:>.6f} {a[1]:>.6f} {a[2]:>.6f}")
+    for i in M:
+        a.append(calcReliabilityMonteCarlo(p, i))
+    print(f"{p:>4} {a[0]:>7f} {a[1]:>8f} {a[2]:>8f}")
 print()
+
+#4
+print("10 spectrum-based reliabilities:")
+reliabilities = []
+for i in range(10):
+    reliabilities.append(calcReliabilityBySpectrum(generateDestructionSpectrum(1000), 0.95))
+
+print(reliabilities)
+print()
+print("Relative standard deviation:", 
+    statistics.stdev(reliabilities) / statistics.mean(reliabilities))
+print()
+#5
+print("10 Monte Carlo-based reliabilities:")
+reliabilities = []
+for i in range(10):
+    reliabilities.append(calcReliabilityMonteCarlo(0.95, 1000))
+
+print(reliabilities)
+print()
+print("Relative standard deviation:", 
+    statistics.stdev(reliabilities) / statistics.mean(reliabilities))
+
