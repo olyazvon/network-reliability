@@ -24,9 +24,11 @@ M = [1000, 10000, 50000]
 p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
 
 
+# Check network model connectivity
 def checkConnectivity(ds):
     return ds.connected(T1, T2) and ds.connected(T2, T3)
 
+# Calculate construction spectrum with given number of repetitions
 def generateConstructionSpectrum(M):
     res = [0] * edges_number
     tmpEdges = list(edges)
@@ -40,26 +42,23 @@ def generateConstructionSpectrum(M):
                 break
     return [i / M for i in res]
 
+# Calculate destruction spectrum based on construction spectrum
 def generateDestructionSpectrum(M):
     return generateConstructionSpectrum(M)[::-1]
 
+# The probability that k out of n objects with relaibility p are UP
 def binomialProbability(n, k, p):
     return comb(n, k) * (p ** k) * ((1 - p) ** (n - k))
 
-# def calcReliabilityBySpectrum(dSpectrum, p):
-#     cumulativeSpectrum = [sum(dSpectrum[0:i + 1]) for i in range(len(dSpectrum))]
-#     res = 0
-#     for i in range(1, len(dSpectrum) + 1):
-#         res += binomialProbability(edges_number, i, 1 - p) * cumulativeSpectrum[i - 1]
-#     return 1 - res
 
+# The probability that at least k out of n objects with relaibility p are UP
 def F(n, k, p):
     sumProb = 0
     for j in range(k, n+1):
         sumProb += binomialProbability(n, j, p)
     return sumProb
 
-
+# Calculate network reliability based on destruction spectrum
 def calcReliabilityBySpectrum(dSpectrum, p):
     res = 0
     for i in range(1, len(dSpectrum) + 1):
@@ -78,6 +77,14 @@ for i, m in enumerate(M):
 print()
 
 # # 2
+# Calculations with cumulative destruction spectrum
+# def calcReliabilityBySpectrum(dSpectrum, p):
+#     cumulativeSpectrum = [sum(dSpectrum[0:i + 1]) for i in range(len(dSpectrum))]
+#     res = 0
+#     for i in range(1, len(dSpectrum) + 1):
+#         res += binomialProbability(edges_number, i, 1 - p) * cumulativeSpectrum[i - 1]
+#     return 1 - res
+
 # p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
 
 # print(f"{'p':>4} {f'M={M[0]}':>8} {f'M={M[1]}':>8} {f'M={M[2]}':>8}")
@@ -100,8 +107,9 @@ for p in p_range:
 print()
 
 
-#######
-
+#############
+#Monte Carlo#
+#############
 
 # Generate randomized state vector representing current state of network
 def generateStateVector(p):
@@ -121,6 +129,7 @@ def generateNetwork(stateVector):
 
     return ds
 
+# Calculate network reliability using Monte Carlo
 def calcReliabilityMonteCarlo(p, repetitions):
     r = 0
     for j in range(repetitions):
