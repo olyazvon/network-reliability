@@ -85,8 +85,6 @@ print()
 #         res += binomialProbability(edges_number, i, 1 - p) * cumulativeSpectrum[i - 1]
 #     return 1 - res
 
-# p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
-
 # print(f"{'p':>4} {f'M={M[0]}':>8} {f'M={M[1]}':>8} {f'M={M[2]}':>8}")
 # for p in p_range:
 #     a = []
