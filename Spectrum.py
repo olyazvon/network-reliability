@@ -28,6 +28,11 @@ p_range=(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.99)
 def checkConnectivity(ds):
     return ds.connected(T1, T2) and ds.connected(T2, T3)
 
+
+###########
+# Spectra #
+###########
+
 # Calculate construction spectrum with given number of repetitions
 def generateConstructionSpectrum(M):
     res = [0] * edges_number
@@ -50,7 +55,6 @@ def generateDestructionSpectrum(M):
 def binomialProbability(n, k, p):
     return comb(n, k) * (p ** k) * ((1 - p) ** (n - k))
 
-
 # The probability that at least k out of n objects with relaibility p are UP
 def F(n, k, p):
     sumProb = 0
@@ -64,7 +68,6 @@ def calcReliabilityBySpectrum(dSpectrum, p):
     for i in range(1, len(dSpectrum) + 1):
         res += F(edges_number, i, 1 - p) * dSpectrum[i - 1]
     return 1 - res
-
 
 
 # 1
@@ -105,9 +108,9 @@ for p in p_range:
 print()
 
 
-#############
-#Monte Carlo#
-#############
+###############
+# Monte Carlo #
+###############
 
 # Generate randomized state vector representing current state of network
 def generateStateVector(p):
@@ -136,6 +139,7 @@ def calcReliabilityMonteCarlo(p, repetitions):
     return r/repetitions
 
 
+# 3
 print("Monte Carlo-based reliability")
 
 print(f"{'p':>4} {f'M={M[0]}':>8} {f'M={M[1]}':>8} {f'M={M[2]}':>8}")
@@ -146,7 +150,7 @@ for p in p_range:
     print(f"{p:>4} {a[0]:>7f} {a[1]:>8f} {a[2]:>8f}")
 print()
 
-#4
+# 4
 print("10 spectrum-based reliabilities:")
 reliabilities = []
 for i in range(10):
@@ -157,6 +161,7 @@ print()
 print("Relative standard deviation:", 
     statistics.stdev(reliabilities) / statistics.mean(reliabilities))
 print()
+
 #5
 print("10 Monte Carlo-based reliabilities:")
 reliabilities = []
